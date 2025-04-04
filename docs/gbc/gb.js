@@ -15,6 +15,7 @@ class GameBoy {
     this.channelCount = 2;
   }
 
+  
   async start({ wasmPath, canvasId, rom, sav }) {
     const canvas = document.getElementById(canvasId);
     this.ctx = canvas.getContext("2d", { alpha: false });
@@ -606,4 +607,58 @@ function make_environment(env) {
       }
     }
   });
+
+  // Replace with your GitHub username and PAT  
+const GITHUB_USER = "your_username";  
+const GITHUB_TOKEN = "your_personal_access_token";  
+
+// Function to save game state to a Gist  
+async function saveToCloud() {  
+  const saveData = localStorage.getItem("gbc_save"); // Or get .sav file  
+  if (!saveData) return alert("No save data found!");  
+
+  const response = await fetch("https://api.github.com/gists", {  
+    method: "POST",  
+    headers: {  
+      "Authorization": `token ${GITHUB_TOKEN}`,  
+      "Content-Type": "application/json",  
+    },  
+    body: JSON.stringify({  
+      description: "GBC Emulator Save File",  
+      public: false, // Private Gist  
+      files: {  
+        "gbc_save.sav": {  
+          content: saveData,  
+        },  
+      },  
+    }),  
+  });  
+
+  const gistUrl = (await response.json()).html_url;  
+  alert(`Game saved to Gist: ${gistUrl}`);  
+}  
+
+// Function to load game state from a Gist  
+async function loadFromCloud(gistId) {  
+  const response = await fetch(`https://api.github.com/gists/${gistId}`, {  
+    headers: {  
+      "Authorization": `token ${GITHUB_TOKEN}`,  
+    },  
+  });  
+
+  const gistData = await response.json();  
+  const saveData = gistData.files["gbc_save.sav"].content;  
+
+  localStorage.setItem("gbc_save", saveData); // Or load into emulator  
+  alert("Game loaded from cloud!");  
+  location.reload(); // Refresh to apply save  
+}  
+
+// Attach event listeners  
+document.getElementById("saveToCloud").addEventListener("click", saveToCloud);  
+document.getElementById("loadFromCloud").addEventListener("click", () => {  
+  const gistId = prompt("Enter Gist ID (from the save URL):");  
+  if (gistId) loadFromCloud(gistId);  
+});  
+
 }
