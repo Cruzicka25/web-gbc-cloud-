@@ -609,7 +609,7 @@ function make_environment(env) {
   });
 
   // Replace with your GitHub username and PAT  
-const GITHUB_USER = "your_username";  
+const GITHUB_USER = "Cruzicka25";  
 const GITHUB_TOKEN = "your_personal_access_token";  
 
 // Function to save game state to a Gist  
